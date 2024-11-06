@@ -1,8 +1,10 @@
 import javax.swing.*;
-import com.toedter.calendar.JCalendar;
-import java.time.*;
+import java.awt.event.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.awt.*; // Ini mencakup BorderLayout dan komponen AWT lainnya
+import java.util.Calendar;
+import java.util.Date; // Ini mencakup BorderLayout dan komponen AWT lainnya
 
 
 /*
@@ -16,32 +18,17 @@ import java.awt.*; // Ini mencakup BorderLayout dan komponen AWT lainnya
  * @author Putra
  */
 public class AplikasiPenghitunganHariframe extends javax.swing.JFrame {
-        
+      
     /**
      * Creates new form AplikasiPenghitunganHariframe
      */
     public AplikasiPenghitunganHariframe() {
        initComponents();
        initializeCustomComponents(); 
-       this.setVisible(true); // Pastikan JFrame terlihat
     }
     
     private void initializeCustomComponents() {
-       // Inisialisasi JComboBox dengan nama bulan
-        String[] months = {"Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                           "Juli", "Agustus", "September", "Oktober", "November", "Desember"};
-        monthComboBox = new JComboBox<>(months);
-
-        // Inisialisasi komponen lainnya
-        calculateButton = new JButton("Hitung");
-        Calendar1 = new JCalendar();
-        Calendar2 = new JCalendar();
-        resultLabel = new JLabel("Hasil akan ditampilkan di sini"); // Inisialisasi JLabel
-
-        // Tambahkan JLabel ke layout (misalnya, JPanel atau langsung ke JFrame)
-        this.setLayout(new BorderLayout());
-        this.add(resultLabel, BorderLayout.SOUTH);
-
+     
         // Menambahkan ActionListener pada tombol hitung
         calculateButton.addActionListener(e -> {
             int monthIndex = monthComboBox.getSelectedIndex() + 1; // Indeks bulan dimulai dari 0
@@ -61,20 +48,59 @@ public class AplikasiPenghitunganHariframe extends javax.swing.JFrame {
                 date2.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
             );
 
-            // Tampilkan hasil di JLabel
-            resultLabel.setText("<html>Selisih hari: " + Math.abs(diff) +
+        });
+        
+        // Menambahkan ActionListener pada tombol hitung
+        calculateButton.addActionListener(e -> calculateDifference());
+        
+        // Menambahkan listener untuk memperbarui JCalendar saat JComboBox atau JSpinner berubah
+        monthComboBox.addActionListener(e -> updateCalendarDate());
+        yearSpinner.addChangeListener(e -> updateCalendarDate());
+    }
+    
+    private void updateCalendarDate() {
+        int monthIndex = monthComboBox.getSelectedIndex(); // Indeks bulan dimulai dari 0
+        int year = (Integer) yearSpinner.getValue(); // Mengambil nilai dari yearSpinner
+
+        // Set tanggal pertama dari bulan dan tahun yang dipilih
+        LocalDate selectedDate = LocalDate.of(year, monthIndex + 1, 1); 
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(java.util.Date.from(selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+        // Perbarui tanggal di JCalendar
+        Calendar1.setCalendar(calendar);
+    }
+    
+    private void calculateDifference() {
+        int monthIndex = monthComboBox.getSelectedIndex() + 1; // Month index starts from 0
+        int year = (Integer) yearSpinner.getValue(); // Get value from yearSpinner
+
+        LocalDate firstDay = LocalDate.of(year, monthIndex, 1);
+        LocalDate lastDay = firstDay.withDayOfMonth(firstDay.lengthOfMonth());
+
+        Date date1 = Calendar1.getDate();
+        Date date2 = Calendar2.getDate();
+
+        long diff = ChronoUnit.DAYS.between(
+                date1.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+                date2.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        );
+
+        // Check if the year is a leap year
+        boolean isLeapYear = isLeapYear(year);
+
+        // Update resultLabel with the results
+        resultLabel.setText("<html>Selisih hari: " + Math.abs(diff) +
                 "<br>Jumlah hari: " + firstDay.lengthOfMonth() +
                 "<br>Hari pertama: " + firstDay.getDayOfWeek() +
-                "<br>Hari terakhir: " + lastDay.getDayOfWeek() + "</html>");
-            this.revalidate(); // Pastikan layout diperbarui
-            this.repaint();
-        });
-
-        // Menambahkan ChangeListener pada yearSpinner
-        yearSpinner.addChangeListener(e -> {
-            int year = (Integer) yearSpinner.getValue();
-            System.out.println("Tahun dipilih: " + year);
-        });
+                "<br>Hari terakhir: " + lastDay.getDayOfWeek() +
+                "<br>Tahun kabisat: " + (isLeapYear ? "Ya" : "Tidak") + "</html>");
+        this.revalidate();
+        this.repaint();
+    }
+    
+    private boolean isLeapYear(int year) {
+        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
     }
     
 
@@ -106,6 +132,11 @@ public class AplikasiPenghitunganHariframe extends javax.swing.JFrame {
         monthComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Januari", "Februari", "Maret", "April", "Mei", "juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" }));
 
         calculateButton.setText("Hitung");
+        calculateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                calculateButtonActionPerformed(evt);
+            }
+        });
 
         resultLabel.setText("Label Hasil");
 
@@ -117,41 +148,46 @@ public class AplikasiPenghitunganHariframe extends javax.swing.JFrame {
                 .addGap(34, 34, 34)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(Calendar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(28, 28, 28)
-                        .addComponent(Calendar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2))
-                        .addGap(27, 27, 27)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(calculateButton)
-                            .addComponent(monthComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(yearSpinner))
-                        .addGap(80, 80, 80)
-                        .addComponent(resultLabel)))
-                .addContainerGap(91, Short.MAX_VALUE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(Calendar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(28, 28, 28)
+                                .addComponent(Calendar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addGap(56, 56, 56)
+                                .addComponent(monthComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap(91, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(18, 18, 18)
+                        .addComponent(yearSpinner, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
+                        .addGap(88, 88, 88)
+                        .addComponent(resultLabel)
+                        .addGap(150, 150, 150))))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(90, 90, 90)
+                .addComponent(calculateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(52, Short.MAX_VALUE)
+                .addContainerGap(49, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(monthComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(yearSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(resultLabel))
+                .addGap(30, 30, 30)
+                .addComponent(calculateButton)
+                .addGap(70, 70, 70)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(Calendar2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1)
-                            .addComponent(monthComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(resultLabel))
-                        .addGap(35, 35, 35)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(yearSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(39, 39, 39)
-                        .addComponent(calculateButton)
-                        .addGap(41, 41, 41)
-                        .addComponent(Calendar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(Calendar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(84, 84, 84))
         );
 
@@ -174,6 +210,10 @@ public class AplikasiPenghitunganHariframe extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void calculateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calculateButtonActionPerformed
+        initializeCustomComponents();// TODO add your handling code here:
+    }//GEN-LAST:event_calculateButtonActionPerformed
 
     /**
      * @param args the command line arguments
