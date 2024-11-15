@@ -1,9 +1,10 @@
 
-# Aplikasi Perhitungan Hari
+# Aplikasi Penghitungan Hari
 
 
 
 # Deskripsi
+
 aplikasi ini digunakan untuk memilih bulan dan tahun, lalu menghitung jumlah hari dalam bulan tersebut, selisih hari, hari pertama dan hari terakhir dalam bulan tersebut dengan mempertimbangkan tahun kabisat.
 # Features
 
@@ -23,10 +24,9 @@ Berikut adalah deskripsi fitur-fitur utama aplikasi ini:
 
 4. Hasil:
 
-- Bagian yang menampilkan hasil kalender sesuai dengan bulan dan tahun yang dimasukkan oleh pengguna. Pada bagian ini, dua kalender ditampilkan untuk bulan yang sama, yang mungkin menunjukkan perbandingan atau kalender alternatif untuk bulan dan tahun yang dipilih.
-# Source Code
-
-```
+- Bagian yang menampilkan hasil kalender sesuai dengan bulan dan tahun yang dimasukkan oleh pengguna. Pada bagian ini, dua kalender ditampilkan untuk bulan yang sama, yang mungkin menunjukkan perbandingan atau kalender alternatif untuk bulan dan tahun yang dipilih. 
+ # Source Code
+ ```java
 import javax.swing.*;
 import java.awt.event.*;
 import java.time.LocalDate;
@@ -307,9 +307,12 @@ public class AplikasiPenghitunganHariframe extends javax.swing.JFrame {
     // End of variables declaration                   
 }
 
-        ```
+```
 
-## Authors
+
+
+
+# Authors
 
 - MuhammadSaputraArjunaidy
 - 2210010300
@@ -317,4 +320,4 @@ public class AplikasiPenghitunganHariframe extends javax.swing.JFrame {
 - [@MuhammadSaputraArjunaidy](https://www.github.com/MuhammadSaputraArjunaidy)
 
 
-## Screenshot
+#  Screenshot
